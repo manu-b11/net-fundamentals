@@ -1,0 +1,68 @@
+:root {
+  --bg: #0d1b22;
+  --bg-alt: #102530;
+  --surface: #15303b;
+  --surface-2: #1b3b47;
+  --line: #2a4a56;
+  --text: #e9f2f1;
+  --text-dim: #93adb2;
+  --accent: #4fd1a5;
+  --accent-2: #ff7a50;
+  --accent-dim: #2c5a4c;
+  --radius: 3px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(
+      ellipse 900px 500px at 8% 0%,
+      rgba(79, 209, 165, 0.07),
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 700px 500px at 100% 30%,
+      rgba(79, 209, 165, 0.05),
+      transparent 60%
+    ),
+    #f7fbf9;
+  color: #17303a;
+  font-family: "Space Grotesk", sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.mono {
+  font-family: "JetBrains Mono", monospace;
+}
+
+a {
+  color: inherit;
+}
+
+.wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+section {
+  padding: 96px 0;
+}
+
+@media (max-width: 720px) {
+  section {
+    padding: 64px 0;
+  }
+  .wrap {
+    padding: 0 20px;
+  }
+}

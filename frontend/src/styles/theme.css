@@ -1,0 +1,81 @@
+/* ---- light content theme ---- */
+section:not(.hero) {
+  background: transparent;
+  color: #17303a;
+}
+section:not(.hero) .section-intro,
+section:not(.hero) .eyebrow-row span:not(.section-index),
+section:not(.hero) .proto-col .sub,
+section:not(.hero) .proto-col li span.dim,
+section:not(.hero) .proto-item .desc,
+section:not(.hero) .osi-name .osi-en,
+section:not(.hero) .osi-desc,
+section:not(.hero) .osi-flow-note,
+section:not(.hero) .range-card p,
+section:not(.hero) thead th,
+section:not(.hero) td.proto-tag {
+  color: #647b82;
+}
+section:not(.hero) .range-card,
+section:not(.hero) .proto-col,
+section:not(.hero) .proto-item,
+section:not(.hero) .osi-layer {
+  background: #ffffff;
+  border-left: 3px solid var(--accent);
+}
+section:not(.hero) .range-cards,
+section:not(.hero) .proto-split,
+section:not(.hero) .proto-grid,
+section:not(.hero) .port-table-wrap,
+section:not(.hero) .osi-layer {
+  border-color: #dbe6e8;
+}
+section:not(.hero) .range-cards,
+section:not(.hero) .proto-split,
+section:not(.hero) .proto-grid {
+  background: #dbe6e8;
+}
+section:not(.hero) thead th {
+  background: #eaf7f1;
+}
+section:not(.hero) tbody td {
+  border-color: #e4edef;
+}
+section:not(.hero) tbody tr:hover,
+section:not(.hero) .proto-item:hover,
+section:not(.hero) .osi-layer:hover {
+  background: #eaf7f1;
+}
+section:not(.hero) .proto-item .name {
+  color: #17303a;
+}
+#protocolos {
+  background: #eff8f4 !important;
+  border-top: 1px solid #dbe6e8 !important;
+  border-bottom: 1px solid #dbe6e8 !important;
+}
+header .brand {
+  color: #17303a;
+}
+.proto-item {
+  min-height: 168px;
+}
+.proto-item .meta {
+  margin-top: 12px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11.5px;
+  color: #2f6c5c;
+}
+h2 {
+  position: relative;
+  padding-top: 14px;
+}
+h2::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 44px;
+  height: 3px;
+  background: var(--accent);
+}

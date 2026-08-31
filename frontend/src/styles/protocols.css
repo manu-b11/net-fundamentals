@@ -1,0 +1,39 @@
+.proto-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+@media (max-width: 860px) {
+  .proto-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 560px) {
+  .proto-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.proto-item {
+  background: var(--bg);
+  padding: 22px 20px;
+  transition: background 0.2s ease;
+  min-height: 168px;
+}
+.proto-item:hover {
+  background: var(--surface);
+}
+.proto-item .name {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+.proto-item .desc {
+  font-size: 13.5px;
+  color: var(--text-dim);
+}

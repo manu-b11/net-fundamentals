@@ -1,0 +1,74 @@
+.hero {
+  padding: 110px 0 90px;
+  background: var(--bg);
+  color: var(--text);
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 64px;
+  align-items: center;
+}
+@media (max-width: 860px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.hero h1 {
+  font-size: clamp(38px, 5.4vw, 60px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 0 0 22px;
+  font-weight: 700;
+}
+.hero p.lead {
+  font-size: 17px;
+  color: var(--text-dim);
+  max-width: 46ch;
+  margin: 0 0 32px;
+}
+.hero-stats {
+  display: flex;
+  gap: 36px;
+  flex-wrap: wrap;
+}
+.hero-stats div {
+  border-left: 2px solid var(--accent);
+  padding-left: 14px;
+}
+.hero-stats .num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.hero-stats .label {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+.packet-viz {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 26px;
+  position: relative;
+}
+.packet-viz .title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 18px;
+}
+.path-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
