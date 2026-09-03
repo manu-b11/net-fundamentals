@@ -1,4 +1,18 @@
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../auth/AuthContext";
+
 function Navbar() {
+  const { session, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
+  const displayName =
+    session?.user?.fullName || session?.user?.username || "Usuario";
+
   return (
     <header>
       <nav>
@@ -22,6 +36,31 @@ function Navbar() {
           <a href="#puertos">Puertos</a>
           <a href="#protocolos">Protocolos</a>
           <a href="#osi">Modelo OSI</a>
+        </div>
+        <div className="nav-auth">
+          {session ? (
+            <>
+              <span className="nav-user" title={session.user.email || ""}>
+                👤 {displayName}
+              </span>
+              <button
+                type="button"
+                className="nav-btn"
+                onClick={handleLogout}
+              >
+                Salir
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="nav-btn">
+                Iniciar sesión
+              </Link>
+              <Link to="/signup" className="nav-btn nav-btn-primary">
+                Registrarse
+              </Link>
+            </>
+          )}
         </div>
       </nav>
     </header>

@@ -50,6 +50,48 @@ nav {
   }
 }
 
+/* Sesión en el navbar: login/registro o usuario + salir */
+.nav-auth {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+.nav-user {
+  color: #17303a;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.nav-btn {
+  text-decoration: none;
+  color: #17303a;
+  border: 1px solid #b9cbd0;
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 13.5px;
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.nav-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.nav-btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.nav-btn-primary:hover {
+  color: #fff;
+  filter: brightness(0.95);
+}
+@media (max-width: 720px) {
+  .nav-auth {
+    margin-left: auto;
+  }
+}
+
 footer {
   background: var(--bg);
   color: var(--text);

@@ -1,0 +1,8 @@
+# .NET (LoginApi)
+**/bin/
+**/obj/
+*.user
+.vs/
+
+# misc
+.DS_Store
