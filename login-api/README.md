@@ -91,12 +91,14 @@ Connection string de ejemplo para `LoginApi/appsettings.json`:
 }
 ```
 
-## Roadmap del API
+## API (implementada)
 
-- `POST /auth/register` — crear usuario (username/email/password → hash BCrypt)
-- `POST /auth/login` — validar credenciales, emitir access token + refresh token
-- `POST /auth/refresh` — rotar refresh token (verifica `token_hash`, `expires_at`, `revoked_at`)
-- `POST /auth/logout` — revocar refresh token
+- `GET /api/health` — estado del servicio
+- `POST /api/auth/register` — crear cuenta `{ fullName, username, password, email? }` → 201 + usuario
+- `POST /api/auth/login` — `{ username, password }` → `{ token, expiresAt, user }` (JWT HS256, 8 h)
+- `GET /api/auth/me` — usuario del Bearer token (requiere `Authorization: Bearer <token>`)
+
+El frontend (`frontend/`) consume estas rutas vía el proxy de Vite (`/api` → `http://localhost:5100`) y guarda el token en `localStorage`/`sessionStorage` según la opción “Recordarme”.
 
 ## Notas
 

@@ -1,16 +1,48 @@
-# React + Vite
+# Frontend — NetFundamentals
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Landing educativa de **fundamentos de redes** (modelo OSI, TCP vs UDP, protocolos y puertos) con páginas de **autenticación** conectadas al backend `login-api` (.NET 9).
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **React 19** + **Vite** + **React Router 7**
+- CSS plano por hoja de estilos (`src/styles/`)
 
-## React Compiler
+## Estructura
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```
+frontend/
+├── src/
+│   ├── pages/             # LandingPage, LoginPage, SignUpPage
+│   ├── components/
+│   │   ├── landing/       # Hero, OsiModel, PorTable, Protocols, TcpUdp
+│   │   └── layout/        # Navbar, AuthLayout
+│   ├── api/auth.js        # Cliente HTTP del backend (login/register/me)
+│   ├── App.jsx            # Rutas + handlers de login/registro
+│   └── styles/
+└── vite.config.js         # Proxy de desarrollo: /api → http://localhost:5100
+```
 
-## Expanding the ESLint configuration
+## Autenticación (flujo integrado)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+| Página | Ruta | Llamada al backend | En éxito |
+|--------|------|--------------------|----------|
+| Login | `/login` | `POST /api/auth/login` | Guarda `token` + `user` y va a `/` |
+| SignUp | `/signup` | `POST /api/auth/register` | Va a `/login` |
+
+- El token se guarda en **`localStorage`** si el usuario marcó "Recordarme"; si no, en `sessionStorage`.
+- El backend devuelve los errores como `{ message }` y se muestran bajo el formulario (`auth-error`).
+- Endpoints consumidos: `/api/auth/login`, `/api/auth/register`, `/api/auth/me` (ver `login-api/README.md`).
+
+## Correr
+
+**Requisito:** backend arriba en `http://localhost:5100` (ver `../login-api/README.md`).
+
+```bash
+npm install
+npm run dev    # → http://localhost:5173
+```
+
+En desarrollo, Vite redirige las llamadas `/api/*` al backend (proxy en `vite.config.js`),
+así que no hay CORS ni URLs hardcodeadas.
+
+Otros scripts: `npm run build`, `npm run preview`, `npm run lint`.
