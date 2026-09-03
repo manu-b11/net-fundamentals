@@ -48,12 +48,13 @@ Documentación completa (esquema de BD, seeds, connection string, endpoints impl
 |--------|--------|
 | Frontend (landing + auth UI) | ✅ Desarrollado y conectado al backend |
 | Backend login-api | ✅ Endpoints de registro/login funcionando (JWT + BCrypt) |
-| Base de datos | 🟡 Esquema listo; requiere SQL Server corriendo |
+| Base de datos | ✅ SQL Server en Docker (`sqlserver`) con BD `LoginApiDB`; flujo probado end-to-end |
 
 ## Correr frontend + backend juntos
 
 ```bash
-# 1. (requisito) SQL Server arriba y BD creada — ver login-api/README.md
+# 1. SQL Server: si el contenedor no está corriendo, `docker start sqlserver`
+#    (si no existe: docker run ... — ver login-api/README.md)
 # 2. Backend en http://localhost:5100
 cd login-api/LoginApi && dotnet run
 # 3. Frontend en http://localhost:5173 (Vite redirige /api/* al backend)
@@ -61,5 +62,6 @@ cd frontend && npm install && npm run dev
 ```
 
 Entra a http://localhost:5173/login y prueba con el seed admin (`admin`/`admin123`).
+Flujo verificado end-to-end el 2026-09-03 (register, login, `/me`).
 
 > Repo con fines académicos. La contraseña del seed admin (`admin`/`admin123`) es solo para desarrollo: cambiarla antes de cualquier despliegue.

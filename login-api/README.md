@@ -29,14 +29,15 @@ login-api/
 users
   ├── id (PK, IDENTITY)
   ├── username (UNIQUE)
-  ├── email (UNIQUE)
+  ├── email (UNIQUE, opcional)
+  ├── full_name (opcional)
   ├── password_hash      → hash BCrypt
   ├── role               → 'Admin' | 'User'
   ├── is_active
   ├── last_login
   └── created_at / updated_at
 
-refresh_tokens
+refresh_tokens        (tabla reservada: el API aún no emite refresh tokens)
   ├── id (PK, IDENTITY)
   ├── user_id (FK → users, ON DELETE CASCADE)
   ├── token_hash         → SHA-256 del token (nunca el token crudo)
@@ -45,18 +46,23 @@ refresh_tokens
   └── created_at
 ```
 
-### 1. Levantar SQL Server (Docker, opcional)
+El `schema.sql` es **re-ejecutable** e incluye la migración de bases creadas
+con el esquema v1 (agrega `full_name` y deja el email opcional).
+
+### 1. Levantar SQL Server (Docker)
 
 ```bash
-docker run -d --name sqlserver \
+docker run -d --name sqlserver --restart unless-stopped \
   -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=TuPass_123!" \
   -p 1433:1433 \
   mcr.microsoft.com/mssql/server:2022-latest
 ```
 
+> En Apple Silicon la imagen corre emulada (linux/amd64); tarda unos segundos en quedar lista.
+
 ### 2. Crear la base de datos
 
-**Requisito:** `sqlcmd` (`brew install sqlcmd`).
+**Opción A** — `sqlcmd` local (`brew install sqlcmd`):
 
 ```bash
 SQLCMD_PASS='TuPass_123!' ./create_db.sh
@@ -65,10 +71,14 @@ SQLCMD_SERVER='localhost,1433' SQLCMD_USER='sa' SQLCMD_PASS='TuPass_123!' ./crea
 ```
 
 El script es **idempotente**: crea `LoginApiDB` y las tablas solo si no existen,
-e inserta datos faltantes. No borra nada. Ejecución manual equivalente:
+e inserta datos faltantes. No borra nada.
+
+**Opción B** — sin instalar nada: el cliente `sqlcmd` ya viene dentro del contenedor
+(`/opt/mssql-tools18/bin/sqlcmd`):
 
 ```bash
-sqlcmd -S localhost,1433 -U sa -P 'TuPass_123!' -C -i schema.sql
+docker cp schema.sql sqlserver:/tmp/schema.sql
+docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'TuPass_123!' -C -i /tmp/schema.sql
 ```
 
 ### Datos iniciales
@@ -77,7 +87,18 @@ sqlcmd -S localhost,1433 -U sa -P 'TuPass_123!' -C -i schema.sql
 |---------|----------|-------|--------------------|
 | `admin` | `admin123` | Admin | admin@login.local |
 
-> ⚠️ Cambiar la contraseña del admin en producción (el hash está en `schema.sql`).
+> ⚠️ Credenciales solo de desarrollo: el hash del seed (en `schema.sql`) corresponde
+> a `admin123` y fue generado con `EnhancedHashPassword` de BCrypt.Net-Next (revisión `$2a$`,
+> que es la que `EnhancedVerify` acepta). Cambiarlo antes de producción.
+
+## Verificación end-to-end (2026-09-03)
+
+Probado en vivo contra SQL Server en Docker (`sqlserver`):
+
+- `POST /api/auth/register` → 201 con el usuario creado
+- `POST /api/auth/login` con `admin`/`admin123` y con un usuario registrado → 200 con token JWT
+- `GET /api/auth/me` con el Bearer token → devuelve el usuario correcto (`id` real)
+- Login con contraseña incorrecta → 401 · Registro duplicado → 409
 
 ## Conectar desde la API
 
@@ -99,6 +120,8 @@ Connection string de ejemplo para `LoginApi/appsettings.json`:
 - `GET /api/auth/me` — usuario del Bearer token (requiere `Authorization: Bearer <token>`)
 
 El frontend (`frontend/`) consume estas rutas vía el proxy de Vite (`/api` → `http://localhost:5100`) y guarda el token en `localStorage`/`sessionStorage` según la opción “Recordarme”.
+
+Pendiente (roadmap): `POST /api/auth/refresh` y `POST /api/auth/logout` usando la tabla `refresh_tokens`.
 
 ## Notas
 
