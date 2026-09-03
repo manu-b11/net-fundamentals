@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
-import { login, register } from "./api/auth";
+import { AuthProvider, useAuth } from "./auth/AuthContext";
 
 import "./styles/global.css";
 import "./styles/layout.css";
@@ -16,20 +16,15 @@ import "./styles/auth.css";
 
 function AppRoutes() {
   const navigate = useNavigate();
+  const { login, register } = useAuth();
 
-  const handleLogin = async ({ username, password, remember }) => {
-    const data = await login({ username, password });
-
-    // Guardar sesión: localStorage si marcó "Recordarme", si no sessionStorage
-    const storage = remember ? localStorage : sessionStorage;
-    storage.setItem("token", data.token);
-    storage.setItem("user", JSON.stringify(data.user));
-
+  const handleLogin = async (creds) => {
+    await login(creds); // guarda la sesión y actualiza el estado global
     navigate("/");
   };
 
   const handleRegister = async ({ name, username, password }) => {
-    await register({ fullName: name, username, password });
+    await register({ name, username, password });
     navigate("/login");
   };
 
@@ -45,7 +40,9 @@ function AppRoutes() {
 function App() {
   return (
     <BrowserRouter>
-      <AppRoutes />
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
     </BrowserRouter>
   );
 }
