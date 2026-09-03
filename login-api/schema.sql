@@ -2,7 +2,8 @@
 -- LoginApi — Esquema de Base de Datos (SQL Server)
 -- Proyecto: LoginApi (.NET 9 minimal API de autenticación)
 -- Motor:   SQL Server 2019+ / Azure SQL (T-SQL)
--- Re-ejecutable: crea solo lo que falte (idempotente)
+-- Re-ejecutable: crea solo lo que falte e idempotente
+-- (incluye migración de columnas para bases ya existentes)
 -- =============================================================
 SET NOCOUNT ON;
 GO
@@ -29,8 +30,9 @@ BEGIN
     CREATE TABLE dbo.users (
         id            INT IDENTITY(1,1) PRIMARY KEY,
         username      NVARCHAR(50)  NOT NULL,
-        email         NVARCHAR(255) NOT NULL,
-        password_hash NVARCHAR(100) NOT NULL,   -- hash BCrypt (BCrypt.Net-Next)
+        email         NVARCHAR(255) NULL,      -- opcional: se registra con o sin correo
+        full_name     NVARCHAR(100) NULL,      -- nombre completo mostrado en la UI
+        password_hash NVARCHAR(100) NOT NULL,  -- hash BCrypt (BCrypt.Net-Next)
         role          NVARCHAR(20)  NOT NULL CONSTRAINT DF_users_role     DEFAULT N'User',
         is_active     BIT           NOT NULL CONSTRAINT DF_users_is_active DEFAULT 1,
         last_login    DATETIME2(0)  NULL,
@@ -64,22 +66,43 @@ END
 GO
 
 -- -----------------------------------------------------------
--- 3. DATOS INICIALES (seeds, idempotente)
+-- 3. MIGRACIÓN DE BASES EXISTENTES (creadas con el esquema v1)
+-- -----------------------------------------------------------
+
+-- 3.1 Columna full_name
+IF COL_LENGTH(N'dbo.users', N'full_name') IS NULL
+BEGIN
+    ALTER TABLE dbo.users ADD full_name NVARCHAR(100) NULL;
+END
+GO
+
+-- 3.2 Email pasa a ser opcional (se quita NOT NULL y se recrea el UNIQUE)
+IF EXISTS (SELECT 1 FROM sys.columns
+           WHERE object_id = OBJECT_ID(N'dbo.users') AND name = N'email' AND is_nullable = 0)
+BEGIN
+    ALTER TABLE dbo.users DROP CONSTRAINT UQ_users_email;
+    ALTER TABLE dbo.users ALTER COLUMN email NVARCHAR(255) NULL;
+    ALTER TABLE dbo.users ADD CONSTRAINT UQ_users_email UNIQUE (email);
+END
+GO
+
+-- -----------------------------------------------------------
+-- 4. DATOS INICIALES (seeds, idempotente)
 -- -----------------------------------------------------------
 
 -- Usuario administrador por defecto
 -- password: admin123  (¡cambiarlo en producción!)
 IF NOT EXISTS (SELECT 1 FROM dbo.users WHERE username = N'admin')
 BEGIN
-    INSERT INTO dbo.users (username, email, password_hash, role)
-    VALUES (N'admin', N'admin@login.local',
+    INSERT INTO dbo.users (username, email, full_name, password_hash, role)
+    VALUES (N'admin', N'admin@login.local', N'Administrador',
             N'$2y$10$MuLFyevqX9v/EwdG.S/SX.gP95Vbozd1uXOCdIt2VGNBDNpoMoxZi',  -- admin123
             N'Admin');
 END
 GO
 
 -- -----------------------------------------------------------
--- 4. VERIFICACIÓN
+-- 5. VERIFICACIÓN
 -- -----------------------------------------------------------
 SELECT 'users'           AS objeto, COUNT(*) AS cantidad FROM dbo.users;
 SELECT 'refresh_tokens'  AS objeto, COUNT(*) AS cantidad FROM dbo.refresh_tokens;

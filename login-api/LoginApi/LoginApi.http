@@ -1,6 +1,30 @@
-@LoginApi_HostAddress = http://localhost:5196
+@LoginApi_HostAddress = http://localhost:5100
 
-GET {{LoginApi_HostAddress}}/weatherforecast/
+### Salud
+GET {{LoginApi_HostAddress}}/api/health
 Accept: application/json
 
-###
+### Registro de usuario
+POST {{LoginApi_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Ana Martínez",
+  "username": "ana",
+  "password": "clave-segura-123"
+}
+
+### Login (devuelve token JWT + usuario)
+# @name login
+POST {{LoginApi_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123"
+}
+
+### Usuario autenticado (Bearer token)
+# Pega aquí el token del login anterior
+GET {{LoginApi_HostAddress}}/api/auth/me
+Authorization: Bearer <TU_TOKEN_AQUI>
