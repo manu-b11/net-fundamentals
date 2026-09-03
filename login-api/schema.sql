@@ -96,7 +96,7 @@ IF NOT EXISTS (SELECT 1 FROM dbo.users WHERE username = N'admin')
 BEGIN
     INSERT INTO dbo.users (username, email, full_name, password_hash, role)
     VALUES (N'admin', N'admin@login.local', N'Administrador',
-            N'$2y$10$MuLFyevqX9v/EwdG.S/SX.gP95Vbozd1uXOCdIt2VGNBDNpoMoxZi',  -- admin123
+            N'$2a$11$nw6FnVwDKv5OJDZa49ZImOq40wH5/1m.JiNHwcCVh/i6fEkq6TG2e',  -- admin123
             N'Admin');
 END
 GO
