@@ -58,14 +58,14 @@ nav {
   font-size: 14px;
 }
 .nav-user {
-  color: var(--text);
-  font-weight: 500;
+  color: #17303a;
+  font-weight: 600;
   white-space: nowrap;
 }
 .nav-btn {
   text-decoration: none;
-  color: var(--text);
-  border: 1px solid var(--line);
+  color: #17303a;
+  border: 1px solid #b9cbd0;
   border-radius: 999px;
   padding: 7px 14px;
   font-size: 13.5px;
