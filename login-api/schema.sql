@@ -6,6 +6,8 @@
 -- (incluye migración de columnas para bases ya existentes)
 -- =============================================================
 SET NOCOUNT ON;
+-- Obligatorio para crear índices filtrados (sqlcmd lo trae OFF por defecto)
+SET QUOTED_IDENTIFIER ON;
 GO
 
 -- -----------------------------------------------------------
@@ -39,7 +41,6 @@ BEGIN
         created_at    DATETIME2(0)  NOT NULL CONSTRAINT DF_users_created_at DEFAULT SYSUTCDATETIME(),
         updated_at    DATETIME2(0)  NOT NULL CONSTRAINT DF_users_updated_at DEFAULT SYSUTCDATETIME(),
         CONSTRAINT UQ_users_username UNIQUE (username),
-        CONSTRAINT UQ_users_email    UNIQUE (email),
         CONSTRAINT CK_users_role     CHECK (role IN (N'Admin', N'User'))
     );
 END
@@ -76,13 +77,37 @@ BEGIN
 END
 GO
 
--- 3.2 Email pasa a ser opcional (se quita NOT NULL y se recrea el UNIQUE)
+-- 3.2 Email opcional con unicidad SOLO entre valores no NULL.
+-- Ojo: SQL Server trata NULL como duplicado en un UNIQUE normal, así que
+-- un UNIQUE sobre email impediría registrar más de un usuario sin correo.
+-- Se usa un índice único filtrado: varios NULL conviven, emails no NULL únicos.
+
+-- Quitar el constraint UNIQUE viejo (si existe, en cualquier forma)
+IF EXISTS (SELECT 1 FROM sys.objects
+           WHERE object_id = OBJECT_ID(N'dbo.users') AND name = N'UQ_users_email')
+BEGIN
+    IF EXISTS (SELECT 1 FROM sys.objects
+               WHERE object_id = OBJECT_ID(N'dbo.users') AND name = N'UQ_users_email' AND type = N'UQ')
+        ALTER TABLE dbo.users DROP CONSTRAINT UQ_users_email;
+    ELSE
+        DROP INDEX UQ_users_email ON dbo.users;
+END
+GO
+
+-- Dejar email nullable (por si viene de una BD v1 con NOT NULL)
 IF EXISTS (SELECT 1 FROM sys.columns
            WHERE object_id = OBJECT_ID(N'dbo.users') AND name = N'email' AND is_nullable = 0)
 BEGIN
-    ALTER TABLE dbo.users DROP CONSTRAINT UQ_users_email;
     ALTER TABLE dbo.users ALTER COLUMN email NVARCHAR(255) NULL;
-    ALTER TABLE dbo.users ADD CONSTRAINT UQ_users_email UNIQUE (email);
+END
+GO
+
+-- Índice único filtrado: reemplaza al constraint UNIQUE
+IF NOT EXISTS (SELECT 1 FROM sys.indexes
+               WHERE object_id = OBJECT_ID(N'dbo.users') AND name = N'UQ_users_email')
+BEGIN
+    CREATE UNIQUE NONCLUSTERED INDEX UQ_users_email
+        ON dbo.users(email) WHERE email IS NOT NULL;
 END
 GO
 
