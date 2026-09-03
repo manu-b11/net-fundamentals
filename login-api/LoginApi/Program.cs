@@ -150,7 +150,7 @@ app.MapPost("/api/auth/login", async (LoginRequest req) =>
 // Devuelve el usuario autenticado por el Bearer token (validación del JWT)
 app.MapGet("/api/auth/me", (ClaimsPrincipal principal) =>
 {
-    var id = principal.FindFirstValue(JwtRegisteredClaimNames.Sub);
+    var id = principal.FindFirstValue(ClaimTypes.NameIdentifier);
     var username = principal.FindFirstValue(ClaimTypes.Name) ?? principal.Identity?.Name ?? "";
     var fullName = principal.FindFirstValue("full_name") ?? username;
     var role = principal.FindFirstValue(ClaimTypes.Role) ?? "User";
