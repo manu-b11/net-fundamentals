@@ -43,6 +43,11 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+// Sirve la UI en producción: el build de frontend/dist se copia a wwwroot (ver deploy/).
+// En desarrollo la UI corre aparte en Vite (5173), así que esto solo aplica si existe wwwroot.
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -156,6 +161,13 @@ app.MapGet("/api/auth/me", (ClaimsPrincipal principal) =>
     var role = principal.FindFirstValue(ClaimTypes.Role) ?? "User";
     return Results.Ok(new UserDto(int.Parse(id ?? "0"), username, fullName, null, role));
 }).RequireAuthorization();
+
+// 404 JSON para rutas /api inexistentes (que no caigan en el fallback SPA)
+app.Map("/api/{**path}", () =>
+    Results.NotFound(new { message = "Ruta no encontrada." }));
+
+// Fallback SPA: /login, /signup y rutas de la UI → index.html
+app.MapFallbackToFile("index.html");
 
 app.Run();
 
